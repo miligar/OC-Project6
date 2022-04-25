@@ -3,8 +3,11 @@
     "bcrypt": "^5.0.1",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.5.0",
+    "mongoose": "^6.3.1",
     "mongoose-unique-validator": "^3.0.0",
     "multer": "^1.4.4",
+    "ng": "^0.0.0",
     "node": "^17.7.2"
   },
   "scripts": {
@@ -15,6 +18,5 @@
   "main": "server.js",
   "author": "",
   "license": "ISC",
-  "devDependencies": {},
   "description": ""
 }
