@@ -4,7 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 
-const stuffRoutes = require('./routes/sauce');
+const sauceRoutes = require('./routes/sauce');
 
 const userRoutes = require('./routes/user');
 
@@ -12,7 +12,9 @@ const app = express();
 
 app.use(express.json());
 
-mongoose.connect('mongodb+srv://miligar:miligar@cluster0.xx7xq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
+require('dotenv').config()
+
+mongoose.connect(`mongodb+srv://${process.env.database}:${process.env.key}@cluster0.xx7xq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
   .then(() => {
     console.log('Successfully connected to MongoDB Atlas!');
   })
