@@ -1,4 +1,3 @@
-//mongodb+srv://miligar:<password>@cluster0.xx7xq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -14,7 +13,7 @@ app.use(express.json());
 
 require('dotenv').config()
 
-mongoose.connect(`mongodb+srv://${process.env.database}:${process.env.key}@cluster0.xx7xq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
+mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.xx7xq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
   .then(() => {
     console.log('Successfully connected to MongoDB Atlas!');
   })
@@ -32,7 +31,7 @@ app.use((req, res, next) => {
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-//app.use('/api/sauces', sauceRoutes);
+app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
 
 module.exports = app;
