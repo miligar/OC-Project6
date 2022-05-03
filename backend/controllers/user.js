@@ -30,6 +30,7 @@ exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email }).then(
     (user) => {
       if (!user) {
+        console.log('error in login')
         return res.status(401).json({
           error: new Error('User not found!')
         });
