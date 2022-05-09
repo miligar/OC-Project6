@@ -164,7 +164,7 @@ exports.createSauce = (req, res, next) => {
 
         if (req.body.like ===-1&&!findLike&&!findDislike) {
           console.log('User disliking this sauce');
-          sauce.dislikes--; 
+          sauce.dislikes++; 
           sauce.usersDisliked.push(userId);
           console.log(sauce.usersDisliked);
         }
