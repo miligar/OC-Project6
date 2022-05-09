@@ -6,7 +6,13 @@ exports.createSauce = (req, res, next) => {
     console.log(req.body.sauce);
     req.body.sauce = JSON.parse(req.body.sauce);
     console.log(req.body.sauce);
-    const sauce = new Sauce({
+    if(req.auth.userId != req.body.sauce.userId) {
+      return res.status(401).json({
+        error: new Error ('UserId incorrect')
+      })
+    }
+
+      const sauce = new Sauce({
       userId: req.body.sauce.userId,
       name: req.body.sauce.name,
       manufacturer: req.body.sauce.manufacturer,
@@ -18,20 +24,21 @@ exports.createSauce = (req, res, next) => {
       dislikes: 0,
       usersLiked: [],
       usersDisliked: [],
-    });
-    sauce.save().then(
+       });
+      sauce.save().then(
       () => {
         res.status(201).json({
           message: 'Post saved successfully!'
         });
       }
-    ).catch(
+      ).catch(
       (error) => {
         res.status(400).json({
           error: error
         });
       }
-    );
+      );
+    
   };
 
   exports.getAllSauces = (req, res, next) => {
@@ -69,6 +76,13 @@ exports.createSauce = (req, res, next) => {
       _id: req.params.id
     }).then(
       (sauce) => {
+
+        if(req.auth.userId != sauce.userId) {
+          return res.status(401).json({
+            error: new Error ('User is not authorized')
+          })
+        };
+
         const filename = sauce.imageUrl.split('/images/')[1];
         fs.unlink('images/' + filename, () => {
           Sauce.deleteOne({
@@ -88,61 +102,77 @@ exports.createSauce = (req, res, next) => {
           );
         });
       }
-    )
-  }
-
-  exports.modifySauce = (req, res, next) => {
-    let sauce = new Sauce({_id: req.params._id});
-    if (req.file){
-      const url = req.protocol + '://' + req.get('host');
-      req.body.sauce = JSON.parse(req.body.sauce);
-
-      //DELETE OLD IMAGE
-      Sauce.findOne({ _id: req.params.id}).then(
-        (oldSauce) => {
-          const filename = oldSauce.imageUrl.split('/images/')[1];
-          fs.unlink('images/' + filename, () => {
-            console.log('Old image ' + filename + ' deleted');
-          });
-        }
-      )
-
-      sauce = {
-        _id: req.params.id,
-        userId: req.body.sauce.userId,
-        name: req.body.sauce.name,
-        manufacturer: req.body.sauce.manufacturer,
-        description: req.body.sauce.description,
-        mainPepper: req.body.sauce.mainPepper,
-        imageUrl: url + '/images/' + req.file.filename,
-        heat: req.body.sauce.heat,
-      };
-
-    } else {
-      sauce = {
-        _id: req.params.id,
-        userId: req.body.userId,
-        name: req.body.name,
-        manufacturer: req.body.manufacturer,
-        description: req.body.description,
-        mainPepper: req.body.mainPepper,
-        imageUrl: req.body.imageUrl,
-        heat: req.body.heat,
-      };
-    }
-    Sauce.updateOne({_id: req.params.id}, sauce).then(
-      () => {
-        res.status(201).json({
-          message: 'Sauce updated successfully!'
-        });
-      }
     ).catch(
       (error) => {
         res.status(400).json({
           error: error
         });
       }
-    );
+    )
+  }
+
+
+  exports.modifySauce = (req, res, next) => {
+
+    let sauce = new Sauce({_id: req.params._id});
+      //DELETE OLD IMAGE
+    Sauce.findOne({ _id: req.params.id}).then(
+      (oldSauce) => {
+
+
+          if(req.auth.userId !== oldSauce.userId) {
+            return res.status(403).json({
+              error: new Error ('User is not authorized')
+            })
+          };
+
+          if (req.file){
+            const url = req.protocol + '://' + req.get('host');
+            req.body.sauce = JSON.parse(req.body.sauce);
+            const filename = oldSauce.imageUrl.split('/images/')[1];
+            fs.unlink('images/' + filename, () => {
+             console.log('Old image ' + filename + ' deleted');
+            });
+
+            sauce = {
+              _id: req.params.id,
+              userId: oldSauce.userId,
+              name: req.body.sauce.name,
+              manufacturer: req.body.sauce.manufacturer,
+              description: req.body.sauce.description,
+              mainPepper: req.body.sauce.mainPepper,
+              imageUrl: url + '/images/' + req.file.filename,
+              heat: req.body.sauce.heat,
+            };
+          } else {
+            sauce = {
+              _id: req.params.id,
+              userId: oldSauce.userId,
+              name: req.body.name,
+              manufacturer: req.body.manufacturer,
+              description: req.body.description,
+              mainPepper: req.body.mainPepper,
+              imageUrl: req.body.imageUrl,
+              heat: req.body.heat,
+            };
+          }
+            
+      
+            Sauce.updateOne({_id: req.params.id}, sauce).then(
+              () => {
+                res.status(201).json({
+                  message: 'Sauce updated successfully!'
+                });
+              }
+            ).catch(
+              (error) => {
+                res.status(400).json({
+                  error: error
+                });
+              }
+            );
+      }
+    )
   };
 
   exports.likeSauce = (req, res, next) => {
