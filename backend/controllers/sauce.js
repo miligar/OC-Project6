@@ -129,7 +129,7 @@ exports.modifySauce = (req, res, next) => {
       });
       sauce = {
         _id: req.params.id,
-        userId: oldSauce.userId, //it is done this way because the owner of the sauce can change the userId of sauce 'by mistake'
+        userId: oldSauce.userId, 
         name: req.body.sauce.name,
         manufacturer: req.body.sauce.manufacturer,
         description: req.body.sauce.description,

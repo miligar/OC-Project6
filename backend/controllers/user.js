@@ -26,6 +26,8 @@ exports.signup = (req, res, next) => {
     );
   };
 
+require('dotenv').config()  
+
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email }).then(
     (user) => {
@@ -44,7 +46,7 @@ exports.login = (req, res, next) => {
           }
           const token = jwt.sign(
             { userId: user._id },
-            'RANDOM_TOKEN_SECRET',
+            process.env.TOKEN_SECRET,
             { expiresIn: '24h' });
           res.status(200).json({
             userId: user._id,
