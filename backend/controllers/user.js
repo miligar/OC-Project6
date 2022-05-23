@@ -1,35 +1,38 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const validator = require('email-validator');
+const emailValidator = require('email-validator');
 const passwordValidator = require('password-validator');
 
 exports.signup = (req, res, next) => {
-    let validEmail = false;
-    let validPass = false; 
-    if(validator.validate(req.body.email)){
-      validEmail = true
-      console.log('Valid email')
+    let validData = false; 
+    if(emailValidator.validate(req.body.email)){
+      console.log('Valid email');
+
+      const schema = new passwordValidator();
+      schema
+      .is().min(8)                                    // Minimum length 8
+      .is().max(100)                                  // Maximum length 100
+      .has().uppercase()                              // Must have uppercase letters
+      .has().lowercase()                              // Must have lowercase letters
+      .has().digits(2)                                // Must have at least 2 digits
+      .has().not().spaces()                           // Should not have spaces
+      .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
+
+      if(schema.validate(req.body.password)){
+        validData = true;
+        console.log('Valid Password');
+      }else{
+        console.log(schema.validate(req.body.password, { details: true }));
+        res.status(400).send('Invalid Password');
+      }
+
     }else{
+      console.log('Invalid Email');
       res.status(400).send('Invalid Email');
-      console.log('Not a valid email')
     }
-    const schema = new passwordValidator();
-    schema
-    .is().min(8)                                    // Minimum length 8
-    .is().max(100)                                  // Maximum length 100
-    .has().uppercase()                              // Must have uppercase letters
-    .has().lowercase()                              // Must have lowercase letters
-    .has().digits(2)                                // Must have at least 2 digits
-    .has().not().spaces()                           // Should not have spaces
-    .is().not().oneOf(['Passw0rd', 'Password123']); // Blacklist these values
-    if(schema.validate(req.body.password) && validEmail){
-      validPass = true
-    }else{
-      console.log(schema.validate(req.body.password, { details: true }));
-      res.status(400).send('Invalid Password');
-    }
-    if(validEmail && validPass){
+    
+    if(validData){
     bcrypt.hash(req.body.password, 10).then(
       (hash) => {
         const user = new User({
