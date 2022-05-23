@@ -26,7 +26,7 @@ exports.signup = (req, res, next) => {
     if(schema.validate(req.body.password) && validEmail){
       validPass = true
     }else{
-      console.log(schema.validate('joke', { details: true }));
+      console.log(schema.validate(req.body.password, { details: true }));
       res.status(400).send('Invalid Password');
     }
     if(validEmail && validPass){
