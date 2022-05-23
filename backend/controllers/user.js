@@ -7,7 +7,7 @@ const passwordValidator = require('password-validator');
 exports.signup = (req, res, next) => {
     let validData = false; 
     if(emailValidator.validate(req.body.email)){
-      console.log('Valid email');
+      console.log('Valid Email');
 
       const schema = new passwordValidator();
       schema
